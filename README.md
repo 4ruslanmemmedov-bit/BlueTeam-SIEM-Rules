@@ -1,1 +1,0 @@
-# BlueTeam-SIEM-Rules
