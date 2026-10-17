@@ -1,0 +1,30 @@
+title: Suspicious Scheduled Task Creation for Persistence
+id: 7a1c2e10-0a1a-4e1a-9b1a-aa1111110003
+status: experimental
+description: Detects creation of a new scheduled task via schtasks.exe or Task Scheduler API, often used for persistence after initial compromise.
+author: Ruslan Mammadov - BlueTeam Account 2 (SOC)
+date: 2026/10/16
+references:
+    - https://attack.mitre.org/techniques/T1053/005/
+logsource:
+    product: windows
+    category: process_creation
+    service: sysmon
+detection:
+    selection:
+        Image|endswith: '\schtasks.exe'
+        CommandLine|contains: '/create'
+    susp_params:
+        CommandLine|contains:
+            - 'powershell'
+            - '\Temp\'
+            - '\AppData\'
+            - '.vbs'
+            - '.hta'
+    condition: selection and susp_params
+falsepositives:
+    - SCCM / GPO deployed legitimate maintenance tasks
+level: high
+tags:
+    - attack.persistence
+    - attack.t1053.005

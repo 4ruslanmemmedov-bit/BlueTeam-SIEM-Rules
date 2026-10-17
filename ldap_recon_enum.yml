@@ -1,0 +1,25 @@
+title: LDAP Reconnaissance / BloodHound-style Enumeration
+id: 7a1c2e10-0a1a-4e1a-9b1a-aa1111110012
+status: experimental
+description: Detects a single source account issuing an abnormally high volume of distinct LDAP search queries in a short window, consistent with AD enumeration tooling (BloodHound, ADRecon).
+author: Ruslan Mammadov - BlueTeam Account 2 (SOC)
+date: 2026/10/16
+references:
+    - https://attack.mitre.org/techniques/T1087/002/
+logsource:
+    category: ldap_search
+    product: windows
+detection:
+    selection:
+        SearchFilter|contains:
+            - 'objectClass=user'
+            - 'admincount=1'
+            - 'objectClass=group'
+    timeframe: 5m
+    condition: selection | count() by SubjectUserName > 200
+falsepositives:
+    - Legitimate directory-sync tools (Keycloak/Authentik SSO sync, bend 29)
+level: medium
+tags:
+    - attack.discovery
+    - attack.t1087.002

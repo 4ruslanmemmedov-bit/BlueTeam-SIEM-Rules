@@ -1,0 +1,32 @@
+title: LSASS Memory Access Indicative of Credential Dumping
+id: 7a1c2e10-0a1a-4e1a-9b1a-aa1111110002
+status: experimental
+description: Detects processes requesting high-privilege access to lsass.exe, a pattern consistent with Mimikatz / Cobalt Strike credential-dumping modules (ties to DFIR scenario, bend 24).
+author: Ruslan Mammadov - BlueTeam Account 2 (SOC)
+date: 2026/10/16
+references:
+    - https://attack.mitre.org/techniques/T1003/001/
+logsource:
+    product: windows
+    category: process_access
+    service: sysmon
+detection:
+    selection:
+        TargetImage|endswith: '\lsass.exe'
+        GrantedAccess:
+            - '0x1010'
+            - '0x1410'
+            - '0x1438'
+            - '0x143a'
+            - '0x1fffff'
+    filter_known_av:
+        SourceImage|contains:
+            - '\Windows\System32\'
+            - 'Bitdefender'
+    condition: selection and not filter_known_av
+falsepositives:
+    - Endpoint protection / Bitdefender XDR agent performing legitimate inspection
+level: critical
+tags:
+    - attack.credential_access
+    - attack.t1003.001

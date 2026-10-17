@@ -1,0 +1,28 @@
+title: Mass File Rename/Extension Change Indicative of Ransomware
+id: 7a1c2e10-0a1a-4e1a-9b1a-aa1111110014
+status: experimental
+description: Detects a single process renaming an abnormally high number of files within a short window, a strong indicator of ransomware encryption behavior (relevant to Account 3 sandbox tests, bend 18, and the IR crisis scenario, bend 32).
+author: Ruslan Mammadov - BlueTeam Account 2 (SOC)
+date: 2026/10/16
+references:
+    - https://attack.mitre.org/techniques/T1486/
+logsource:
+    category: file_event
+    product: windows
+    service: sysmon
+detection:
+    selection:
+        EventID: 11
+        TargetFilename|contains:
+            - '.locked'
+            - '.encrypted'
+            - '.crypt'
+            - 'README'
+    timeframe: 2m
+    condition: selection | count() by Image > 50
+falsepositives:
+    - Backup/sync software performing legitimate bulk file operations
+level: critical
+tags:
+    - attack.impact
+    - attack.t1486

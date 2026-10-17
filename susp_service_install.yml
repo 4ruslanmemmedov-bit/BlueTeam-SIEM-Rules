@@ -1,0 +1,25 @@
+title: Suspicious Windows Service Installation
+id: 7a1c2e10-0a1a-4e1a-9b1a-aa1111110005
+status: experimental
+description: Detects installation of a new service pointing to a binary in a temp/user-writable path, frequently used by malware and lateral-movement tools (PsExec-style).
+author: Ruslan Mammadov - BlueTeam Account 2 (SOC)
+date: 2026/10/16
+references:
+    - https://attack.mitre.org/techniques/T1543/003/
+logsource:
+    product: windows
+    service: system
+detection:
+    selection:
+        EventID: 7045
+        ImagePath|contains:
+            - '\Temp\'
+            - '\Users\Public\'
+            - '\AppData\'
+    condition: selection
+falsepositives:
+    - Legitimate software deployed through SCCM distribution points with nonstandard paths
+level: high
+tags:
+    - attack.persistence
+    - attack.t1543.003

@@ -1,0 +1,25 @@
+title: Group Policy Object Modified Outside Change Window
+id: 7a1c2e10-0a1a-4e1a-9b1a-aa1111110011
+status: experimental
+description: Detects modification of a GPO (LAPS, password policy, RDP/USB blocks, Credential Guard, LDAP Signing - bend 3) which could indicate an attacker weakening domain hardening controls.
+author: Ruslan Mammadov - BlueTeam Account 2 (SOC)
+date: 2026/10/16
+references:
+    - https://attack.mitre.org/techniques/T1484/001/
+logsource:
+    product: windows
+    service: security
+detection:
+    selection:
+        EventID:
+            - 5136
+            - 5137
+            - 5141
+        ObjectClass: 'groupPolicyContainer'
+    condition: selection
+falsepositives:
+    - Scheduled, ticketed GPO maintenance by Account 1 (correlate with change calendar)
+level: high
+tags:
+    - attack.defense_evasion
+    - attack.t1484.001

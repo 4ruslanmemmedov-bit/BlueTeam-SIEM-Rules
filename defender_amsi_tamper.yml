@@ -1,0 +1,30 @@
+title: Windows Defender or AMSI Tampering Attempt
+id: 7a1c2e10-0a1a-4e1a-9b1a-aa1111110008
+status: experimental
+description: Detects attempts to disable Defender real-time protection or patch AMSI in-memory, a precursor commonly seen before deploying stealer/ransomware payloads (relevant to Account 3's sandbox tests, bend 18/20).
+author: Ruslan Mammadov - BlueTeam Account 2 (SOC)
+date: 2026/10/16
+references:
+    - https://attack.mitre.org/techniques/T1562/001/
+logsource:
+    product: windows
+    category: process_creation
+    service: sysmon
+detection:
+    selection_defender:
+        CommandLine|contains:
+            - 'Set-MpPreference'
+            - 'DisableRealtimeMonitoring'
+            - 'Add-MpPreference -ExclusionPath'
+    selection_amsi:
+        CommandLine|contains:
+            - 'amsi.dll'
+            - 'AmsiScanBuffer'
+            - '[Ref].Assembly.GetType'
+    condition: selection_defender or selection_amsi
+falsepositives:
+    - Authorized red-team / sandbox testing activity performed by Account 3 (should be whitelisted by change window, not by default)
+level: critical
+tags:
+    - attack.defense_evasion
+    - attack.t1562.001

@@ -1,0 +1,23 @@
+title: Windows Security Event Log Cleared
+id: 7a1c2e10-0a1a-4e1a-9b1a-aa1111110013
+status: experimental
+description: Detects clearing of the Security or System event log, a common anti-forensic step taken right before or after an attacker achieves objectives.
+author: Ruslan Mammadov - BlueTeam Account 2 (SOC)
+date: 2026/10/16
+references:
+    - https://attack.mitre.org/techniques/T1070/001/
+logsource:
+    product: windows
+    service: security
+detection:
+    selection:
+        EventID:
+            - 1102
+            - 104
+    condition: selection
+falsepositives:
+    - Rare legitimate log rotation / disk-space maintenance (should still be reviewed manually)
+level: critical
+tags:
+    - attack.defense_evasion
+    - attack.t1070.001

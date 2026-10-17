@@ -1,0 +1,33 @@
+title: Suspicious PowerShell Execution with Encoded Command
+id: 7a1c2e10-0a1a-4e1a-9b1a-aa1111110001
+status: experimental
+description: Detects PowerShell invoked with -EncodedCommand / -enc, commonly used to obfuscate payloads, download cradles, and evade static detection.
+author: Ruslan Mammadov - BlueTeam Account 2 (SOC)
+date: 2026/10/16
+references:
+    - https://attack.mitre.org/techniques/T1059/001/
+    - https://attack.mitre.org/techniques/T1027/
+logsource:
+    product: windows
+    category: process_creation
+    service: sysmon
+detection:
+    selection:
+        Image|endswith: '\powershell.exe'
+        CommandLine|contains:
+            - '-enc '
+            - '-EncodedCommand'
+            - '-e '
+            - 'FromBase64String'
+            - '-nop -w hidden'
+    filter_main_known_admin:
+        ParentImage|endswith: '\sccmexec.exe'
+    condition: selection and not filter_main_known_admin
+falsepositives:
+    - Legitimate SCCM / admin automation scripts using encoded commands
+level: high
+tags:
+    - attack.execution
+    - attack.t1059.001
+    - attack.defense_evasion
+    - attack.t1027

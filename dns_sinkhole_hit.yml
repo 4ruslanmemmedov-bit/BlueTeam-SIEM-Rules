@@ -1,0 +1,21 @@
+title: DNS Query Resolved by Sinkhole (Malicious Domain Contacted)
+id: 7a1c2e10-0a1a-4e1a-9b1a-aa1111110010
+status: experimental
+description: Detects a host resolving a domain that the DNS Sinkhole (bend 31, Account 1) has already flagged as malicious, confirming an infected endpoint attempted outbound C2/phishing contact.
+author: Ruslan Mammadov - BlueTeam Account 2 (SOC)
+date: 2026/10/16
+references:
+    - https://attack.mitre.org/techniques/T1071/004/
+logsource:
+    category: dns
+    product: windows
+detection:
+    selection:
+        answer: '0.0.0.0'
+    condition: selection
+falsepositives:
+    - Misconfigured sinkhole entry blocking a legitimate domain (verify against the sinkhole blocklist feed)
+level: high
+tags:
+    - attack.command_and_control
+    - attack.t1071.004

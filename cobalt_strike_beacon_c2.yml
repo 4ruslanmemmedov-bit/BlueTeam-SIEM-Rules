@@ -1,0 +1,30 @@
+title: Possible Cobalt Strike Beacon C2 Traffic Pattern
+id: 7a1c2e10-0a1a-4e1a-9b1a-aa1111110009
+status: experimental
+description: Detects periodic, low-jitter outbound HTTP/HTTPS beaconing to a small set of external destinations with Malleable-C2-style User-Agent / URI patterns (relevant to Account 3's Cobalt Strike test, bend 20).
+author: Ruslan Mammadov - BlueTeam Account 2 (SOC)
+date: 2026/10/16
+references:
+    - https://attack.mitre.org/techniques/T1071/001/
+    - https://attack.mitre.org/techniques/T1573/
+logsource:
+    category: network_connection
+    product: windows
+detection:
+    selection:
+        DestinationPort:
+            - 443
+            - 80
+            - 8080
+        Initiated: 'true'
+    susp_ua:
+        - 'User-Agent|contains:'
+        - 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)'
+    condition: selection and susp_ua
+falsepositives:
+    - Legitimate application with similar beacon-like keep-alive patterns; correlate with Zeek/Suricata JA3 fingerprint before escalating
+level: high
+tags:
+    - attack.command_and_control
+    - attack.t1071.001
+    - attack.t1573

@@ -1,0 +1,25 @@
+title: PsExec-style Lateral Movement Detected
+id: 7a1c2e10-0a1a-4e1a-9b1a-aa1111110007
+status: experimental
+description: Detects the classic PsExec artifact chain - creation of PSEXESVC service and named pipe, used for remote command execution across domain hosts.
+author: Ruslan Mammadov - BlueTeam Account 2 (SOC)
+date: 2026/10/16
+references:
+    - https://attack.mitre.org/techniques/T1021/002/
+logsource:
+    product: windows
+    category: pipe_created
+    service: sysmon
+detection:
+    selection:
+        PipeName|contains:
+            - '\PSEXESVC'
+            - '\jaas'
+            - '\atsvc'
+    condition: selection
+falsepositives:
+    - Legitimate Sysinternals-based remote admin usage by IT staff
+level: high
+tags:
+    - attack.lateral_movement
+    - attack.t1021.002

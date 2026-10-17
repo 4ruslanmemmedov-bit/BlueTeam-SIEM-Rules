@@ -1,0 +1,25 @@
+title: T-Pot Honeypot Received Sensitive Path Probe
+id: 7a1c2e10-0a1a-4e1a-9b1a-aa1111110015
+status: experimental
+description: Detects an external source probing sensitive admin paths (e.g. /wp-admin) redirected to the T-Pot honeypot (bend 11), confirming active reconnaissance against the perimeter.
+author: Ruslan Mammadov - BlueTeam Account 2 (SOC)
+date: 2026/10/16
+references:
+    - https://attack.mitre.org/techniques/T1595/
+logsource:
+    category: webserver
+    product: tpot
+detection:
+    selection:
+        cs_uri_stem|contains:
+            - '/wp-admin'
+            - '/.env'
+            - '/phpmyadmin'
+            - '/.git/config'
+    condition: selection
+falsepositives:
+    - None expected - any traffic reaching the honeypot is inherently suspicious by design
+level: medium
+tags:
+    - attack.reconnaissance
+    - attack.t1595

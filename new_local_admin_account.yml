@@ -1,0 +1,25 @@
+title: New Local Administrator Account Created
+id: 7a1c2e10-0a1a-4e1a-9b1a-aa1111110004
+status: experimental
+description: Detects creation of a new user account followed by addition to the local Administrators group, a common privilege-escalation / persistence pattern.
+author: Ruslan Mammadov - BlueTeam Account 2 (SOC)
+date: 2026/10/16
+references:
+    - https://attack.mitre.org/techniques/T1136/001/
+logsource:
+    product: windows
+    service: security
+detection:
+    selection_create:
+        EventID: 4720
+    selection_group:
+        EventID: 4732
+        TargetUserName|contains: 'Admin'
+    condition: selection_create or selection_group
+falsepositives:
+    - Legitimate IT onboarding performed by domain admins (correlate with known change tickets)
+level: medium
+tags:
+    - attack.persistence
+    - attack.privilege_escalation
+    - attack.t1136.001
