@@ -1,3 +1,4 @@
+# splunk_index: win_server
 id: ca0a299e-1abe-400f-ad13-1e91ddb09b1c
 title: Failed RDP Logon
 name: failed_rdp_logon
@@ -9,7 +10,7 @@ logsource:
 detection:
     selection:
         EventID: 4625
-        LogonType: 10
+        LogonType: [3, 10]
     condition: selection
 level: low
 ---
