@@ -1,26 +1,38 @@
-title: RDP Brute Force Followed by Successful Logon
-id: 7a1c2e10-0a1a-4e1a-9b1a-aa1111110006
+id: ca0a299e-1abe-400f-ad13-1e91ddb09b1c
+title: Failed RDP Logon
+name: failed_rdp_logon
 status: experimental
-description: Detects a burst of failed RDP logons (4625) from a single source followed by a successful logon (4624) within a short window.
-author: Ruslan Mammadov - BlueTeam Account 2 (SOC)
-date: 2026/10/16
-references:
-    - https://attack.mitre.org/techniques/T1110/001/
+description: Base rule - failed interactive RDP logon (4625, LogonType 10).
 logsource:
     product: windows
     service: security
 detection:
-    failed:
+    selection:
         EventID: 4625
         LogonType: 10
-    success:
-        EventID: 4624
-        LogonType: 10
-    timeframe: 10m
-    condition: failed | count(failed) by IpAddress > 8 and success
+    condition: selection
+level: low
+---
+title: RDP Brute Force
+id: 7a1c2e10-0a1a-4e1a-9b1a-aa1111110006
+status: experimental
+description: Correlation - 9 or more failed RDP logons from the same source IP within 10 minutes.
+author: Ruslan Mammadov - BlueTeam Account 2 (SOC)
+date: 2026/10/17
+references:
+    - https://attack.mitre.org/techniques/T1110/001/
+correlation:
+    type: event_count
+    rules:
+        - failed_rdp_logon
+    group-by:
+        - IpAddress
+    timespan: 10m
+    condition:
+        gte: 9
 falsepositives:
-    - Shared jump-host / PAM gateway with aggregated source IP (correlate with Teleport/Guacamole PAM session logs)
+    - Shared jump host or PAM gateway presenting one source IP (correlate with PAM session logs)
 level: high
 tags:
-    - attack.credential_access
+    - attack.credential-access
     - attack.t1110.001

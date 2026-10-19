@@ -1,30 +1,28 @@
-title: Possible Cobalt Strike Beacon C2 Traffic Pattern
+title: Possible Cobalt Strike Default Named Pipe
 id: 7a1c2e10-0a1a-4e1a-9b1a-aa1111110009
 status: experimental
-description: Detects periodic, low-jitter outbound HTTP/HTTPS beaconing to a small set of external destinations with Malleable-C2-style User-Agent / URI patterns (relevant to Account 3's Cobalt Strike test, bend 20).
+description: Detects creation or connection of named pipes used by default Cobalt Strike profiles (SMB beacon, post-exploitation jobs). A custom Malleable C2 profile may rename the pipes, so this covers default/unchanged settings (relevant to Account 3's Cobalt Strike test, bend 20).
 author: Ruslan Mammadov - BlueTeam Account 2 (SOC)
-date: 2026/10/16
+date: 2026/10/17
 references:
-    - https://attack.mitre.org/techniques/T1071/001/
-    - https://attack.mitre.org/techniques/T1573/
+    - https://attack.mitre.org/techniques/T1055/
+    - https://attack.mitre.org/techniques/T1570/
 logsource:
-    category: network_connection
     product: windows
+    category: pipe_created
+    service: sysmon
 detection:
     selection:
-        DestinationPort:
-            - 443
-            - 80
-            - 8080
-        Initiated: 'true'
-    susp_ua:
-        - 'User-Agent|contains:'
-        - 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)'
-    condition: selection and susp_ua
+        PipeName|contains:
+            - '\MSSE-'
+            - '\msagent_'
+            - '\postex_'
+            - '\mypipe-'
+    condition: selection
 falsepositives:
-    - Legitimate application with similar beacon-like keep-alive patterns; correlate with Zeek/Suricata JA3 fingerprint before escalating
+    - Rare legitimate software using similar pipe names (verify the process that created the pipe)
 level: high
 tags:
-    - attack.command_and_control
-    - attack.t1071.001
-    - attack.t1573
+    - attack.command-and-control
+    - attack.defense-evasion
+    - attack.t1055

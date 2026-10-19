@@ -1,27 +1,42 @@
-title: Mass File Rename/Extension Change Indicative of Ransomware
-id: 7a1c2e10-0a1a-4e1a-9b1a-aa1111110014
+id: dc6a6a14-aeb0-4d76-922a-45be8b39868e
+title: Ransomware-style File Created
+name: ransomware_file_created
 status: experimental
-description: Detects a single process renaming an abnormally high number of files within a short window, a strong indicator of ransomware encryption behavior (relevant to Account 3 sandbox tests, bend 18, and the IR crisis scenario, bend 32).
-author: Ruslan Mammadov - BlueTeam Account 2 (SOC)
-date: 2026/10/16
-references:
-    - https://attack.mitre.org/techniques/T1486/
+description: Base rule - file creation with typical ransomware extensions.
 logsource:
-    category: file_event
     product: windows
+    category: file_event
     service: sysmon
 detection:
     selection:
-        EventID: 11
-        TargetFilename|contains:
+        TargetFilename|endswith:
             - '.locked'
             - '.encrypted'
-            - '.crypt'
-            - 'README'
-    timeframe: 2m
-    condition: selection | count() by Image > 50
+            - '.crypted'
+            - '.ransom'
+            - '.lockbit'
+    condition: selection
+level: high
+---
+title: Mass File Encryption Indicative of Ransomware
+id: 7a1c2e10-0a1a-4e1a-9b1a-aa1111110014
+status: experimental
+description: Correlation - one process creating 50 or more files with ransomware-style extensions within 2 minutes (relevant to Account 3 sandbox ransomware tests, bend 18, and the IR scenario, bend 32). Extension list must match the test sample.
+author: Ruslan Mammadov - BlueTeam Account 2 (SOC)
+date: 2026/10/17
+references:
+    - https://attack.mitre.org/techniques/T1486/
+correlation:
+    type: event_count
+    rules:
+        - ransomware_file_created
+    group-by:
+        - Image
+    timespan: 2m
+    condition:
+        gte: 50
 falsepositives:
-    - Backup/sync software performing legitimate bulk file operations
+    - Backup or sync software creating many files with unusual extensions
 level: critical
 tags:
     - attack.impact
